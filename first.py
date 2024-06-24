@@ -55,8 +55,10 @@ class URL:
                 response_headers[header.casefold()] = value.strip()
             assert "transfer-encoding" not in response_headers
             
-
-            content = response.read(int(response_headers['content-length']))
+            if(response_headers.__contains__('content-length')):
+                content = response.read(int(response_headers['content-length']))
+            else:
+                content = response.read()
             KeepAlive.keepSocket(KeepAlive(self.url, s))
             if(response_headers.__contains__('location') and status.startswith('3')):
                 load(response_headers['location'])
