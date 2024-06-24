@@ -4,6 +4,8 @@ from PIL import Image
 
 class URL:
     def __init__(self, url) -> None:
+        if url[:12] == "view-source:":
+            url = url[12:]
         self.scheme, url = url.split("://",1)
         assert self.scheme in ["http", "https", "file"]
         if "/" not in url:
@@ -61,17 +63,25 @@ def show(body):
             in_tag = True
         elif c == ">":
             in_tag = False
+        elif c == "&lt;":
+            c = "<"
+        elif c == "&gt;":
+            c = ">"
         elif not in_tag:
             print(c, end="")
 
 def load(url):
-    body = url.request()
-    if body != None:
+    urlURL = URL(url)
+    body = urlURL.request()
+    if body != None and url[:12] != "view-source:":
         show(body)
+    elif url[:12] == "view-source:":
+        for c in body:
+            print(c, end="")
 
 if __name__ == "__main__":
     import sys
     if len(sys.argv)<2:
         show("escreve de novo burro")
     else:
-        load(URL(sys.argv[1]))
+        load(sys.argv[1])
