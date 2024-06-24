@@ -23,6 +23,7 @@ class URL:
             self.port = int(port)
 
     def request(self):
+        #Olha, se alguém quiser contribuir, só falta msm adicionar sistema de caching de páginas, compressão e KeepAlive. Tmj abraço.
         if self.scheme == "file":
             im = Image.open(self.path)
             im.show()
