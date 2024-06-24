@@ -54,9 +54,18 @@ class URL:
                 response_headers[header.casefold()] = value.strip()
             assert "transfer-encoding" not in response_headers
             
+
             content = response.read(int(response_headers['content-length']))
             KeepAlive.keepSocket(KeepAlive(self.url, s))
-            return content
+            if(response_headers.__contains__('location') and status.startswith('3')):
+                load(response_headers['location'])
+            else:
+                return content
+    
+def redirects(errorCode, locationHeader):
+    i = 0
+    pass
+                
     
 class KeepAlive(object):
     def __init__(self, url, socket) -> None:
@@ -65,7 +74,11 @@ class KeepAlive(object):
     def keepSocket(self):
         dupla = KeepAlive(self.url, self.socket)
         with open('broserHistory.pkl', 'wb') as outp:
-            p.dump(str(dupla), outp, p.HIGHEST_PROTOCOL)
+            p.dump("dupla.socket", outp, p.HIGHEST_PROTOCOL)
+            #A linha acima não funciona, infelizmente pickle n consegue salvar websockets, 
+            #Coloquei o que temos aqui dentro de um str() para não dar erro, mas o método
+            #por enquanto é bem inútil. Se tiver alguém que saiba como salvar essas coisas forte abraço.
+            
 
 
 
