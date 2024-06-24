@@ -1,11 +1,13 @@
 import socket
 import ssl 
 from PIL import Image
+import pickle as p
 
 class URL:
     def __init__(self, url) -> None:
         if url[:12] == "view-source:":
             url = url[12:]
+        self.url = url
         self.scheme, url = url.split("://",1)
         assert self.scheme in ["http", "https", "file"]
         if "/" not in url:
@@ -19,12 +21,13 @@ class URL:
         if ":" in self.host:
             self.host, port = self.host.split(":",1)
             self.port = int(port)
-            
+
     def request(self):
         if self.scheme == "file":
             im = Image.open(self.path)
             im.show()
         else:
+
             s = socket.socket(
                 family= socket.AF_INET,
                 type=socket.SOCK_STREAM,
@@ -36,8 +39,7 @@ class URL:
                 s = ctx.wrap_socket(s, server_hostname= self.host)
             request = "GET {} HTTP/1.0\r\n".format(self.path)
             request += "Host: {}\r\n".format(self.host)
-            request += "User-Agent: Wacky PC\r\n" 
-            request += "close\r\n"
+            request += "User-Agent: Wacky PC\r\n"
             request += "\r\n"
             s.send(request.encode("utf8"))
 
@@ -51,10 +53,22 @@ class URL:
                 header, value = line.split(":",1)
                 response_headers[header.casefold()] = value.strip()
             assert "transfer-encoding" not in response_headers
-            content = response.read()
-            s.close()
+            
+            content = response.read(int(response_headers['content-length']))
+            KeepAlive.keepSocket(KeepAlive(self.url, s))
             return content
     
+class KeepAlive(object):
+    def __init__(self, url, socket) -> None:
+        self.url = url
+        self.socket = socket
+    def keepSocket(self):
+        dupla = KeepAlive(self.url, self.socket)
+        with open('broserHistory.pkl', 'wb') as outp:
+            p.dump(str(dupla), outp, p.HIGHEST_PROTOCOL)
+
+
+
 
 def show(body):
     in_tag = False
