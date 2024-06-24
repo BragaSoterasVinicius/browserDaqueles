@@ -5,7 +5,7 @@ from PIL import Image
 class URL:
     def __init__(self, url) -> None:
         self.scheme, url = url.split("://",1)
-        assert self.scheme in ["http", "https", "file"]
+        assert self.scheme in ["http", "https"]
         if "/" not in url:
             url = url + "/"
         self.host, url = url.split("/", 1)
@@ -53,6 +53,12 @@ class URL:
             s.close()
             return content
     
+class data:
+    def __init__(self, text):
+        self.scheme, self.text = text.split(",", 2)
+    def response(self):
+        return self.text
+
 
 def show(body):
     in_tag = False
@@ -67,11 +73,12 @@ def show(body):
 def load(url):
     body = url.request()
     if body != None:
-        show(body)
+       show(body)
 
 if __name__ == "__main__":
     import sys
     if len(sys.argv)<2:
         show("escreve de novo burro")
-    else:
-        load(URL(sys.argv[1]))
+    else:  
+        print(data.response(data(sys.argv[1])))
+        #load(URL(sys.argv[1]))
