@@ -2,6 +2,57 @@ import socket
 import ssl 
 from PIL import Image
 import pickle as p
+import tkinter
+
+class BrowserWindow:
+    def __init__(self, WIDTH, HEIGHT) -> None:
+        self.scroll = 0
+        self.WIDTH = WIDTH
+        self.HEIGHT = HEIGHT
+        self.window = tkinter.Tk()
+        self.canvas = tkinter.Canvas(
+            self.window, 
+            width=WIDTH,
+            height=HEIGHT
+        )
+        self.canvas.pack()
+        self.window.bind("<Down>", self.scrolldown)
+
+    def load(self, url):
+       
+        urlURL = URL(url)
+        body = urlURL.request()
+        if body != None and url[:12] != "view-source:":
+            show(body)
+        elif url[:12] == "view-source:":
+            for c in body:
+                print(c, end="")
+        text = lex(body)
+        self.display_list = layout(text, self.WIDTH, self.HEIGHT)
+        self.draw()
+
+    def draw(self):
+        self.canvas.delete("all")
+        for x,y,c in self.display_list:
+            self.canvas.create_text(x,y - self.scroll, text=c)
+
+    
+    def scrolldown(self, e):
+        SCROLL_STEP = 10
+        self.scroll += SCROLL_STEP
+        self.draw()
+
+def layout(text, WIDTH, HEIGHT):
+    display_list = []
+    HSTEP, VSTEP = 13, 18
+    cursor_x, cursor_y = HSTEP, VSTEP
+    for c in text:
+        display_list.append((cursor_x, cursor_y, c))
+        cursor_x += HSTEP
+        if cursor_x >= WIDTH - HSTEP:
+            cursor_y += VSTEP
+            cursor_x = HSTEP
+    return display_list
 
 class URL:
     def __init__(self, url) -> None:
@@ -82,9 +133,20 @@ class KeepAlive(object):
             #Coloquei o que temos aqui dentro de um str() para não dar erro, mas o método
             #por enquanto é bem inútil. Se tiver alguém que saiba como salvar essas coisas forte abraço.
             
-
-
-
+def lex(body):
+    text = ""
+    for c in body:
+        if c == "<":
+            in_tag = True
+        elif c == ">":
+            in_tag = False
+        elif c == "&lt;":
+            c = "<"
+        elif c == "&gt;":
+            c = ">"
+        elif not in_tag:
+            text += c
+    return text
 
 def show(body):
     in_tag = False
@@ -100,18 +162,10 @@ def show(body):
         elif not in_tag:
             print(c, end="")
 
-def load(url):
-    urlURL = URL(url)
-    body = urlURL.request()
-    if body != None and url[:12] != "view-source:":
-        show(body)
-    elif url[:12] == "view-source:":
-        for c in body:
-            print(c, end="")
-
 if __name__ == "__main__":
     import sys
     if len(sys.argv)<2:
         show("escreve de novo burro")
     else:
-        load(sys.argv[1])
+        BrowserWindow(800, 600).load(sys.argv[1])
+        tkinter.mainloop()
