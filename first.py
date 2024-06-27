@@ -25,8 +25,9 @@ class URL:
     def request(self):
         #Olha, se alguém quiser contribuir, só falta msm adicionar sistema de caching de páginas, compressão e KeepAlive. Tmj abraço.
         if self.scheme == "file":
-            im = Image.open(self.path)
-            im.show()
+         #   im = Image.open(self.path)
+          #  im.show()
+          pass
         else:
 
             s = socket.socket(
@@ -55,8 +56,10 @@ class URL:
                 response_headers[header.casefold()] = value.strip()
             assert "transfer-encoding" not in response_headers
             
-
-            content = response.read(int(response_headers['content-length']))
+            if 'content-length' in response_headers:
+                content = response.read(int(response_headers['content-length']))
+            else:
+                content = response.read()
             KeepAlive.keepSocket(KeepAlive(self.url, s))
             if(response_headers.__contains__('location') and status.startswith('3')):
                 load(response_headers['location'])
@@ -98,7 +101,15 @@ def show(body):
         elif not in_tag:
             print(c, end="")
 
+def verify(url):
+    mostused = {"wiki":"https://pt.wikipedia.org/wiki"}
+    try:
+        return mostused[url]
+    except KeyError:
+        return url
+
 def load(url):
+    url = verify(url)
     urlURL = URL(url)
     body = urlURL.request()
     if body != None and url[:12] != "view-source:":
