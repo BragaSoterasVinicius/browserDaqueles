@@ -23,6 +23,7 @@ class URL:
             self.port = int(port)
 
     def request(self):
+        addUrlToFastLinks(self)
         #Olha, se alguém quiser contribuir, só falta msm adicionar sistema de caching de páginas, compressão e KeepAlive. Tmj abraço.
         if self.scheme == "file":
          #   im = Image.open(self.path)
@@ -102,11 +103,31 @@ def show(body):
             print(c, end="")
 
 def verify(url):
-    mostused = {"wiki":"https://pt.wikipedia.org/wiki"}
-    try:
-        return mostused[url]
-    except KeyError:
-        return url
+    with open('fastLinks.pkl', 'rb') as inpt:
+        e = p.load(inpt)
+        print(e.host)
+        print(url)
+        print(e.url)
+        if e.host == url:
+            print(e.url + "boaa")
+            return e.url
+    return url
+
+def isUrlInFile(urlKey):
+    with open('fastLinks.pkl', 'rb') as inpt:
+        e = p.load(inpt)
+        if e.url == urlKey.url:
+            return False
+        
+def addUrlToFastLinks(urlKey):
+    if isUrlInFile(urlKey):
+        with open('fastLinks.pkl', 'wb') as outp:
+            p.dump(urlKey, outp, p.HIGHEST_PROTOCOL)
+
+def listLinks():
+    with open('fastLinks.pkl', 'rb') as t:
+        e = p.load(t)
+        print(e.host+'.......'+e.url)
 
 def load(url):
     url = verify(url)
@@ -123,4 +144,7 @@ if __name__ == "__main__":
     if len(sys.argv)<2:
         show("escreve de novo burro")
     else:
-        load(sys.argv[1])
+        if(sys.argv[1] == "list"):
+            listLinks()
+        else:
+            load(sys.argv[1])
