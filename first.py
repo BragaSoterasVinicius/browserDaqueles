@@ -137,19 +137,38 @@ class KeepAlive(object):
             #por enquanto é bem inútil. Se tiver alguém que saiba como salvar essas coisas forte abraço.
             
 def lex(body):
+    in_tag = False
     text = ""
+    tag = ""
     for c in body:
         if c == "<":
             in_tag = True
         elif c == ">":
             in_tag = False
+            text += tagForChange(tag)
+            print(tag+ " added")
+            tag = ""
         elif c == "&lt;":
             c = "<"
         elif c == "&gt;":
             c = ">"
         elif not in_tag:
             text += c
+        elif in_tag:
+            tag += c
     return text
+
+def tagForChange(tag):
+    if tag == "br":
+        return "\n"
+    elif tag == "blockquote":
+        return "\n\n"
+    elif tag == "p":
+        return ""
+    elif tag == "header":
+        return "pula a linha \ "
+    else:
+        return ""
 
 def show(body):
     in_tag = False
