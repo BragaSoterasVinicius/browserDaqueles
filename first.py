@@ -13,9 +13,9 @@ class BrowserWindow:
         self.canvas = tkinter.Canvas(
             self.window, 
             width=WIDTH,
-            height=HEIGHT
+            height=HEIGHT,
         )
-        self.canvas.pack()
+        self.canvas.pack(fill="both", expand=1)
         self.window.bind("<Down>", self.scrolldown)
         self.window.bind("<Up>", self.scrollup)
         self.window.bind("<MouseWheel>", self.onMouseWheel)
@@ -37,8 +37,6 @@ class BrowserWindow:
         VSTEP = 18
         self.canvas.delete("all")
         for x,y,c in self.display_list:
-            if y > self.scroll + self.HEIGHT: continue
-            if y + VSTEP < self.scroll: continue
             self.canvas.create_text(x,y - self.scroll, text=c)
 
     
@@ -51,7 +49,7 @@ class BrowserWindow:
         self.scroll -= SCROLL_STEP
         self.draw()
     def onMouseWheel(self, e):
-        SCROLL_STEP= 100
+        SCROLL_STEP= 20
         self.scroll += int(-1*(e.delta/120))*SCROLL_STEP
         self.draw()
 
