@@ -17,6 +17,7 @@ class BrowserWindow:
         )
         self.canvas.pack()
         self.window.bind("<Down>", self.scrolldown)
+        self.window.bind("<Up>", self.scrollup)
 
     def load(self, url):
        
@@ -44,7 +45,11 @@ class BrowserWindow:
         SCROLL_STEP = 100
         self.scroll += SCROLL_STEP
         self.draw()
-
+    def scrollup(self, e):
+        SCROLL_STEP = 100
+        self.scroll -= SCROLL_STEP
+        self.draw()
+    
 def layout(text, WIDTH, HEIGHT):
     display_list = []
     HSTEP, VSTEP = 13, 18
