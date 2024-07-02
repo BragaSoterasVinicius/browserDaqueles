@@ -18,6 +18,7 @@ class BrowserWindow:
         self.canvas.pack()
         self.window.bind("<Down>", self.scrolldown)
         self.window.bind("<Up>", self.scrollup)
+        self.window.bind("<MouseWheel>", self.onMouseWheel)
 
     def load(self, url):
        
@@ -49,7 +50,11 @@ class BrowserWindow:
         SCROLL_STEP = 100
         self.scroll -= SCROLL_STEP
         self.draw()
-    
+    def onMouseWheel(self, e):
+        SCROLL_STEP= 100
+        self.scroll += int(-1*(e.delta/120))*SCROLL_STEP
+        self.draw()
+
 def layout(text, WIDTH, HEIGHT):
     display_list = []
     HSTEP, VSTEP = 13, 18
