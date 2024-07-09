@@ -35,8 +35,13 @@ class BrowserWindow:
 
     def draw(self):
         VSTEP = 18
+        self.HEIGHT = self.window.winfo_height()
+        self.WIDTH = self.window.winfo_width()
+        print(self.HEIGHT)
         self.canvas.delete("all")
         for x,y,c in self.display_list:
+            if y> self.scroll + self.HEIGHT: continue
+            if y + VSTEP < self.scroll: continue    
             self.canvas.create_text(x,y - self.scroll, text=c)
 
     
