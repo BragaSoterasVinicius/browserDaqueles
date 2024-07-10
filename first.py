@@ -30,37 +30,56 @@ class BrowserWindow:
             for c in body:
                 print(c, end="")
         text = lex(body)
-        self.display_list = layout(text, self.WIDTH, self.HEIGHT)
+        self.display_list = layout(self, text, self.WIDTH, self.HEIGHT)
         self.draw()
 
     def draw(self):
         VSTEP = 18
         self.HEIGHT = self.window.winfo_height()
         self.WIDTH = self.window.winfo_width()
-        print(self.HEIGHT)
         self.canvas.delete("all")
         for x,y,c in self.display_list:
             if y> self.scroll + self.HEIGHT: continue
             if y + VSTEP < self.scroll: continue    
             self.canvas.create_text(x,y - self.scroll, text=c)
 
-    
+    def testendpage(self) -> bool:
+        if self.scroll > self.cursor_y:
+            print("limit reach")
+            return False
+        else:
+            return True
+    def testStartPage(self) -> bool:
+        if self.scroll < 0:
+            print("limit reach")
+            return False
+        else:
+            return True
     def scrolldown(self, e):
-        SCROLL_STEP = 100
-        self.scroll += SCROLL_STEP
-        self.draw()
+        
+        if self.testendpage():
+            SCROLL_STEP = 100
+            self.scroll += SCROLL_STEP
+            self.draw()
     def scrollup(self, e):
-        SCROLL_STEP = 100
-        self.scroll -= SCROLL_STEP
-        self.draw()
+        if self.testStartPage():
+            print(self.scroll)
+            SCROLL_STEP = 100
+            self.scroll -= SCROLL_STEP
+            self.draw()
     def onMouseWheel(self, e):
-        SCROLL_STEP= 20
+        SCROLL_STEP = 20
+        if self.testStartPage() != True:
+            self.scroll = 0
+        if self.testendpage() != True:
+            self.scroll = self.cursor_y
+        
         self.scroll += int(-1*(e.delta/120))*SCROLL_STEP
         self.draw()
 
-def layout(text, WIDTH, HEIGHT):
+def layout(self, text, WIDTH, HEIGHT):
     display_list = []
-    HSTEP, VSTEP = 13, 18
+    HSTEP, VSTEP = 8, 18
     cursor_x, cursor_y = HSTEP, VSTEP
     for c in text:
         display_list.append((cursor_x, cursor_y, c))
@@ -68,6 +87,7 @@ def layout(text, WIDTH, HEIGHT):
         if cursor_x >= WIDTH - HSTEP:
             cursor_y += VSTEP
             cursor_x = HSTEP
+    self.cursor_x, self.cursor_y = cursor_x, cursor_y
     return display_list
 
 class URL:
