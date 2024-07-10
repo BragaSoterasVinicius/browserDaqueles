@@ -19,7 +19,12 @@ class BrowserWindow:
         self.window.bind("<Down>", self.scrolldown)
         self.window.bind("<Up>", self.scrollup)
         self.window.bind("<MouseWheel>", self.onMouseWheel)
-
+        self.scrollbar = tkinter.Scrollbar(self.canvas, orient="vertical",command=self.canvas.yview)
+        self.scrollbar.pack(side="right", fill="y")
+        self.window.bind(
+            '<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
+        
     def load(self, url):
        
         urlURL = URL(url)
